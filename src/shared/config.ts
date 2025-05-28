@@ -24,13 +24,13 @@ class ConfigSchema {
   REFRESH_TOKEN_SECRET: string;
   @IsString()
   REFRESH_TOKEN_EXPIRES_IN: string;
+  @IsString()
+  SECRET_API_KEY: string;
 }
 const configServer = plainToInstance(ConfigSchema, process.env, {
   enableImplicitConversion: true,
 });
 const error = validateSync(configServer);
-console.log(configServer);
-console.log(error);
 if (error.length > 0) {
   console.log('Cac gia tri khai bao trong .env khong hop le');
   const errors = error.map((eItem) => {

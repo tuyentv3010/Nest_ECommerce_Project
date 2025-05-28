@@ -23,7 +23,6 @@ export class TransformInterceptor<T>
       map((data) => {
         const ctx = context.switchToHttp();
         const response = ctx.getResponse();
-        console.log('response', response);
         const statusCode = response.statusCode;
         return { data, statusCode };
       }),

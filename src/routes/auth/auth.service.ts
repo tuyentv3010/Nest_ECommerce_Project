@@ -85,7 +85,7 @@ export class AuthService {
     try {
       // 1 Kiem tra refreshToken co hop le khong
       const { userId } =
-        await this.tokenService.verifyAccessToken(refreshToken);
+        await this.tokenService.verifyRefreshToken(refreshToken);
       //2 Kiem tra refresh token co ton tai trong database?
       await this.prismaService.refreshToken.findUniqueOrThrow({
         where: {
@@ -100,6 +100,25 @@ export class AuthService {
       });
       // 4. Tao moi access token vs refresh token
       return await this.generateTokens({ userId });
+    } catch (error) {
+      // Truong hop da refresh token roi , hay thong bao cho user biet refresh token da bi danh cap
+      if (isNotFoundPrismaError(error)) {
+        throw new UnauthorizedException('refresh token has been revoked');
+      }
+      throw new UnauthorizedException();
+    }
+  }
+  async logout(refreshToken: string) {
+    try {
+      // 1 Kiem tra refreshToken co hop le khong
+      await this.tokenService.verifyRefreshToken(refreshToken);
+      // 2 . Xoa refresh Token
+      await this.prismaService.refreshToken.delete({
+        where: {
+          token: refreshToken,
+        },
+      });
+      return { message: 'Logout Successfully' };
     } catch (error) {
       // Truong hop da refresh token roi , hay thong bao cho user biet refresh token da bi danh cap
       if (isNotFoundPrismaError(error)) {
